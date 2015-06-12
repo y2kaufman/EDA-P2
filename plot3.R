@@ -7,7 +7,7 @@ setwd("C:/Users/David/Desktop/Data Science/Exploratory Data Analysis/EDA Project
 ## Which have seen increases in emissions from 1999???2008? 
 ## Use the ggplot2 plotting system to make a plot answer this question.
 
-## This first line will likely take a few seconds. Be patient!
+## This will take a few seconds. Be patient!
 NEI <- readRDS("./data/summarySCC_PM25.rds")
 
 library(dplyr)
@@ -20,19 +20,21 @@ neibalt <- NEI %>% filter(fips == "24510")
 
 neisumm <- ddply(neibalt, c("type",  "year"),
                  summarise,
-                 BaltPollutant = sum(Emissions))
+                 Baltimore_Pollutant = sum(Emissions))
+
 
 
 with(neisumm, { 
-#     windows(5,5)
-     qplot(year, BaltPollutant,
+     windows(5,5)
+     qplot(year, Baltimore_Pollutant,
            data = neisumm,
            color=type,
+           main="Total Pollutant by Type in Baltimore",
 #           facets = year ~ .,
-           geom="line")})
+           geom=c("line","smooth"), method="lm", formula=y~x)})
 
 
-#dev.copy(png, file="./output/plot3.png")
+dev.copy(png, file="./output/plot3.png")
 dev.off()
 
 ############################################################################

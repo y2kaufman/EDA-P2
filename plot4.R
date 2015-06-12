@@ -3,6 +3,8 @@ library(dplyr)
 library(data.table)
 library(lubridate)
 library(plyr)
+library(ggplot2)
+
 
 ## Across the United States, how have emissions 
 ## from coal combustion-related sources changed from 1999-2008?
@@ -31,9 +33,20 @@ un <- unique(coalcombdata$Short.Name)
 
 coalcombsumm <- ddply(coalcombdata, c("Pollutant", "year"),
            summarise,
-           TotalPollutant = sum(Emissions)          )
+           Total_Pollutant = sum(Emissions)          )
 
-#with(neisumm, plot(year, TotalPollutant, type = "b"))
+with(coalcombsumm, { 
+      windows(5,5)
+      qplot(year, Total_Pollutant,
+            data = coalcombsumm,
+            color=Pollutant,
+            main="Coal Combustion Pollutant by Type across the US",
+            #           facets = year ~ .,
+            geom=c("line","smooth"), method="lm", formula=y~x)})
+
+
+dev.copy(png, file="./output/plot4.png")
+dev.off()
 
 ############################################################################
 #    the end
@@ -41,5 +54,3 @@ coalcombsumm <- ddply(coalcombdata, c("Pollutant", "year"),
 
 dateCompleted <- date()
 dateCompleted
-
-      
