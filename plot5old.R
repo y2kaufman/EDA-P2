@@ -20,8 +20,7 @@ nei.scc <- join(NEI,SCC, by = "SCC")
 ## setkey(nei.scc, Short.Name)
 
 #subset data of motor vehicle related sources by pulling short names
-#containing "highway". this was based on inspection of the data
-
+#containing "highway". this was based on visual inspection of the data
 motordata <- nei.scc[grep("highway", x = nei.scc$Short.Name, 
                          value = F, ignore.case=T)]
 
@@ -35,19 +34,6 @@ motordata$EI.Sector <- factor(motordata$EI.Sector, labels =
                     "Gas Hvy Duty",
                     "Gas Lt Duty")                  )
 
-motormean <- ddply(motordata, c("EI.Sector", "year"),
-                   summarise, Mean_Pollutant = mean(Emissions) )
-
-with(motormean, { 
-      qplot(year, Mean_Pollutant,
-            data = motormean,
-            color=EI.Sector,
-            xlab = "Year", 
-            ylab = "Mean Pollutant (tons)",
-            main="Avg Baltimore City Motor Vehicle Emissions Across all Sectors",
-            geom=c("point", "line"))})
-#           geom=c("line","smooth"), method="lm", formula=y~x)})
-
 motorsumm <- ddply(motordata, c("EI.Sector", "year"),
            summarise, Total_Pollutant = sum(Emissions) )
 
@@ -55,8 +41,6 @@ with(motorsumm, {
       qplot(year, Total_Pollutant,
             data = motorsumm,
             color=EI.Sector,
-            xlab = "Year", 
-            ylab = "Total Pollutant (tons)",
             main="Baltimore City Motor Vehicle Emissions Across all Sectors",
             geom=c("point", "line"))})
 #           geom=c("line","smooth"), method="lm", formula=y~x)})

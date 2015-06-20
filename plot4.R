@@ -1,10 +1,11 @@
 setwd("C:/Users/David/Desktop/Data Science/Exploratory Data Analysis/EDA Project 2")
+library(plyr)
 library(dplyr)
 library(data.table)
-library(lubridate)
-library(plyr)
+#library(lubridate)
 library(ggplot2)
-
+library(grid)
+library(gridExtra)
 
 ## Across the United States, how have emissions 
 ## from coal combustion-related sources changed from 1999-2008?
@@ -15,10 +16,6 @@ SCC <- data.table(readRDS("./data/Source_Classification_Code.rds"))
 
 nei.scc <- join(NEI,SCC, by = "SCC")
 
-#write.table(nei.scc, "./output/nei.scc.txt",  row.name=FALSE)
-
-##############################
-
 #subset data of coal related sources
 coaldata <- nei.scc[grep("coal", x = nei.scc$Short.Name, 
                          value = F, ignore.case=T)]
@@ -27,30 +24,34 @@ coaldata <- nei.scc[grep("coal", x = nei.scc$Short.Name,
 coalcombdata <- coaldata[grep("comb", x = coaldata$Short.Name, 
                               value = F,ignore.case=T)]
 
+coalcombmean <- ddply(coalcombdata, c("Pollutant", "year", "type"),
+                      summarise,
+                      Mean_Pollutant = mean(Emissions)          )
 
+coalcombsumm <- ddply(coalcombdata, c("Pollutant", "year", "type"),
+                      summarise,
+                      Total_Pollutant = sum(Emissions)          )
 
-un <- unique(coalcombdata$Short.Name)
+p1 <- ggplot(coalcombmean, aes(x=year, y=Mean_Pollutant, color = type)) +
+             geom_point(alpha = 0.3) +
+             geom_line() +
+             labs(x="Year", y = "Mean Pollutant (tons)") +
+             ggtitle("Average Coal Cumbustion by Type")
 
-coalcombsumm <- ddply(coalcombdata, c("Pollutant", "year"),
-           summarise,
-           Total_Pollutant = sum(Emissions)          )
+p2 <- ggplot(coalcombsumm, aes(x=year, y=Total_Pollutant, color = type)) +
+             geom_point(alpha = 0.3) +
+             geom_line() +
+             labs(x="Year", y = "Total Pollutant (tons)") +
+             ggtitle("Total Coal Cumbustion by Type")
 
-with(coalcombsumm, { 
-      windows(5,5)
-      qplot(year, Total_Pollutant,
-            data = coalcombsumm,
-            color=Pollutant,
-            main="Coal Combustion Pollutant by Type across the US",
-            #           facets = year ~ .,
-            geom=c("line","smooth"), method="lm", formula=y~x)})
-
+grid.arrange(p1, p2, ncol = 1, main = "US PM25 Coal Cumbustion Trends 1999-2008")
 
 dev.copy(png, file="./output/plot4.png")
 dev.off()
 
+dateCompleted <- date()
+dateCompleted
+
 ############################################################################
 #    the end
 ############################################################################
-
-dateCompleted <- date()
-dateCompleted

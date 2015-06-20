@@ -16,8 +16,10 @@ neisumm <- ddply(NEI, c("Pollutant", "year"),
 with(neisumm, {
      windows(5,5)
      plot(year, TotalPollutant, 
-                   main = "Total U.S. PM2.5 Emissions 1999-2008",
-                   type = "b")})
+          main = "Total U.S. PM2.5 Emissions 1999-2008",
+          ylab = "PM2.5 Pollutant (tons)",
+          col = "red",      #just to give the chart some color
+          type = "b")})
      
 dev.copy(png, file="./output/plot1.png")
 dev.off()
